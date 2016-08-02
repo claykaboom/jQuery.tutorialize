@@ -1,0 +1,109 @@
+ <script type="text/javascript">
+
+        var tutorialPoints = [
+                        {
+                            element: "menu",
+                            text: "Here you can find the menu. Obviously with this you can navigate through the application."
+                        }
+                        , {
+                            element: "#footer",
+                            text: "Here you can find the footer. Nobody really gives attention to the footer. It is your chance to be different."
+                        }
+                        , {
+                            onShow: closeSideBar,
+                            element: "sideBar",
+                            text: "There is also this awesome sideBar where you can find some basic and useful functionalities of the system." +
+                                 "<br /> <b style='font-size:16px'>Try hovering your mouse upon it!</b>" +
+                                 "<br /> Would you have noticed if I had not told you?"
+                        }
+                        , {
+                            onBeforeShow: openSideBar,
+                            element: "#imgDownload",
+                            text: "Click here to download the Scania Util&#39;s MVC DLL!"
+                        }
+                        , {
+                            onShow: closeSideBar,
+                            element: "content",
+                            text: "Well, that is all by now! " +
+                                  "<ul><li  ><a onclick=\"amplify.store('learnedTutorial', true)\" href=\"#\" >Click here if you don&#39;t want to see this tutorial again.</a></li> " +
+                                  "<li  ><a onclick=\"amplify.store('learnedTutorial', false)\" href=\"#\" >Click here if you want to see this tutorial everytime you enter in this system.</a> </li>" +
+                                  "</ul><br /> Click close to close this tutorial."
+                        }
+                     ];
+
+        function openTutorial() {
+
+            $("body").tutorialize({ steps: tutorialPoints
+                                    , close: function () { amplify.store("learnedTutorial", true) }
+                                    , arrowImgSource: "/site/scaniaAsset.axd?f=QnIuU2NhbmlhLlV0aWwuTVZDLkV4dGVuc2lvbnMuVHV0b3JpYWxfUmVzb3VyY2VzLmFycm93LnBuZw=="
+                                   , localization: { NextText: "Next",
+                                       PreviousText: "Previous",
+                                       CloseText: "Close",
+                                       ArrowText: "Click here to go to Next Tip."
+                                   }
+            }).tutorialize('nextAction');
+        }
+        function openSideBar(callBack) {
+
+            $("#sideBarContent").children('span').show().animate({ left: -5 }, 5);
+            $("#sideBar").animate({ width: '200px' }, 500, "swing",
+                                                        function () {
+                                                            if (callBack != null) {
+                                                                callBack();
+                                                            }
+                                                        }
+                                                        );
+
+        }
+
+        function closeSideBar() {
+
+            $("#sideBar").animate({ width: '20px' }, 500);
+            $("#sideBarContent").children('span').animate({ left: -35 }, 5).fadeOut(5);
+        }
+
+
+
+        $().ready(function () {
+            $("#sideBarContent").hover(function () {
+                if ($("body").tutorialize("currentStep") == 2) {
+                    openSideBar(function () { $("body").tutorialize("nextAction"); })
+                }
+                else {
+                    openSideBar();
+                }
+            }, closeSideBar);
+
+            $(window).scroll(function () {
+                var offset = 0 + $(document).scrollTop() + "px";
+                $("#sideBar").animate({ top: offset }, { duration: 500, queue: false });
+            });
+
+
+            if (
+                    (amplify.store.sessionStorage("alreadySawTutorial") == null || amplify.store.sessionStorage("alreadySawTutorial") == false)
+                        &&
+                    (amplify.store("learnedTutorial") == null || amplify.store("learnedTutorial") == false)
+                ) {
+                $("#tutorialStart").dialog({
+                    modal: true
+                , title: "Welcome to   Live Demo Tour!"
+                            , show: "bounce"
+                            , resizable: false
+                            , width: 400, height: 300
+                            , close: function () {
+                                amplify.store.sessionStorage("alreadySawTutorial", true)
+                            }
+                            , buttons: {
+                                "OK": function () {
+                                    $("#tutorialStart").dialog("destroy");
+                                    amplify.store.sessionStorage("alreadySawTutorial", true)
+                                    openTutorial();
+                                }
+                            }
+                }
+              );
+            }
+
+        });
+    </script>
